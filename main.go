@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"go-pingen-sdk/pingen"
 	"os"
 	"time"
 
+	"github.com/GoneUp/go-pingen-sdk/pingen"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
@@ -27,7 +27,8 @@ func main() {
 	org := os.Getenv("PINGEN_ORG")
 
 	c := pingen.NewClient(clientID, clientSecret, true, org, context.Background())
-
+	c.ListLetters()
+	
 	//demo run
 	bytes, err := os.ReadFile("demo_mustermann.pdf")
 	if err != nil {
