@@ -17,7 +17,7 @@ func init() {
 
 func main() {
 	log.Info("Startup")
-	err := godotenv.Load()
+	err := godotenv.Load(".env.dev")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -26,9 +26,13 @@ func main() {
 	clientSecret := os.Getenv("CLIENT_SECRET")
 	org := os.Getenv("PINGEN_ORG")
 
-	c := pingen.NewClient(clientID, clientSecret, true, org, context.Background())
+	var c *pingen.Client
+	c, err = pingen.NewClient(clientID, clientSecret, true, org, context.Background())
+	if err != nil {
+		log.Fatalf("Init failed, error %w", err)
+	}
 	c.ListLetters()
-	
+
 	//demo run
 	bytes, err := os.ReadFile("demo_mustermann.pdf")
 	if err != nil {

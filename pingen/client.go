@@ -30,8 +30,10 @@ type AuthSuccess struct {
 	AccessToken string `json:"access_token"`
 }
 
-func NewClient(clientID string, clientSecret string, useProd bool, organisationId string, ctx context.Context) Client {
-	var c Client
+//Creates a new client struct
+func NewClient(clientID string, clientSecret string, useProd bool, organisationId string, ctx context.Context) (*Client, error) {
+	c := &Client{}
+
 	c.ClientID = clientID
 	c.ClientSecret = clientSecret
 	c.OrganisationId = organisationId
@@ -51,16 +53,22 @@ func NewClient(clientID string, clientSecret string, useProd bool, organisationI
 	c.httpClient = resty.New()
 	c.httpClient.SetBaseURL(c.BaseUrl)
 	c.httpClient.SetHeader("Accept", "application/json")
-	c.httpClient.SetAuthToken(c.getBearer())
-	return c
+	bearerToken, err := c.getBearer()
+	if err == nil {
+		c.httpClient.SetAuthToken(bearerToken)
+	} else {
+		return nil, err
+	}
+
+	return c, nil
 }
 
-func (c *Client) getBearer() string {
+func (c *Client) getBearer() (string, error) {
 	//Check if we have cached values
 	if !c.BearerExpiry.IsZero() && c.Bearer != nil {
 		if c.BearerExpiry.Before(time.Now()) && c.Bearer.AccessToken != "" {
 			//bearer not expired
-			return c.Bearer.AccessToken
+			return c.Bearer.AccessToken, nil
 		}
 	}
 
@@ -72,16 +80,27 @@ func (c *Client) getBearer() string {
 			"client_secret": c.ClientSecret,
 		}).
 		SetResult(authResult).
+		
 		Post("/auth/access-tokens")
+
+	if err != nil {
+		log.Errorf("Auth error: %v", err)
+		return "", fmt.Errorf("failed to get Bearer token, check your client credentials and if you use the correct environment. Error: %w", err)
+	}
+	if resp.IsError() {
+		log.Errorf("Auth error: %v", resp)
+		return "", fmt.Errorf("failed to get Bearer token, check your client credentials and if you use the correct environment. Error: %v", resp)
+	}
 
 	if err != nil || resp.StatusCode() != 200 {
 		log.Fatalf("auth code wrong: %v", err)
+
 	}
 
 	c.Bearer = authResult
 	c.BearerExpiry = resp.ReceivedAt().Add(time.Second * time.Duration(c.Bearer.ExpiresIn))
 	log.Debugf("got auth! " + c.BearerExpiry.String())
-	return c.Bearer.AccessToken
+	return c.Bearer.AccessToken, nil
 }
 
 func (c *Client) ListLetters() (result *LetterList, err error) {
