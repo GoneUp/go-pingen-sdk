@@ -24,7 +24,9 @@ Simple usage with (or see [main.go](main.go))
 ```
 
 
-## API Keys
+## API Information
+
+[Documentation](https://api.v2.pingen.com/documentation)
 
 You need a API key, type Client Credentials. Instructions can be found [here](https://api.v2.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID). The organisation UUID can be found in any URL on the website.
 

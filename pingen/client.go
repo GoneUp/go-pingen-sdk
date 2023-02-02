@@ -11,15 +11,15 @@ import (
 )
 
 type Client struct {
-	ClientID     string
-	ClientSecret string
+	clientID     string
+	clientSecret string
 
-	BaseUrl        string
-	IdentiyUrl     string
-	OrganisationId string
+	baseUrl        string
+	identiyUrl     string
+	organisationId string
 
-	Bearer       *AuthSuccess
-	BearerExpiry time.Time
+	bearer       *AuthSuccess
+	bearerExpiry time.Time
 	httpClient   *resty.Client
 	authClient   *resty.Client
 }
@@ -34,24 +34,24 @@ type AuthSuccess struct {
 func NewClient(clientID string, clientSecret string, useProd bool, organisationId string, ctx context.Context) (*Client, error) {
 	c := &Client{}
 
-	c.ClientID = clientID
-	c.ClientSecret = clientSecret
-	c.OrganisationId = organisationId
+	c.clientID = clientID
+	c.clientSecret = clientSecret
+	c.organisationId = organisationId
 
 	if useProd {
-		c.BaseUrl = "https://api.v2.pingen.com"
-		c.IdentiyUrl = "https://identity.pingen.com"
+		c.baseUrl = "https://api.v2.pingen.com"
+		c.identiyUrl = "https://identity.pingen.com"
 	} else {
-		c.BaseUrl = "https://api-staging.v2.pingen.com"
-		c.IdentiyUrl = "https://identity-staging.pingen.com"
+		c.baseUrl = "https://api-staging.v2.pingen.com"
+		c.identiyUrl = "https://identity-staging.pingen.com"
 	}
 
 	//order is important, auth needs to be initalized first
 	c.authClient = resty.New()
-	c.authClient.SetBaseURL(c.IdentiyUrl)
+	c.authClient.SetBaseURL(c.identiyUrl)
 
 	c.httpClient = resty.New()
-	c.httpClient.SetBaseURL(c.BaseUrl)
+	c.httpClient.SetBaseURL(c.baseUrl)
 	c.httpClient.SetHeader("Accept", "application/json")
 	bearerToken, err := c.getBearer()
 	if err == nil {
@@ -65,10 +65,10 @@ func NewClient(clientID string, clientSecret string, useProd bool, organisationI
 
 func (c *Client) getBearer() (string, error) {
 	//Check if we have cached values
-	if !c.BearerExpiry.IsZero() && c.Bearer != nil {
-		if c.BearerExpiry.Before(time.Now()) && c.Bearer.AccessToken != "" {
+	if !c.bearerExpiry.IsZero() && c.bearer != nil {
+		if c.bearerExpiry.Before(time.Now()) && c.bearer.AccessToken != "" {
 			//bearer not expired
-			return c.Bearer.AccessToken, nil
+			return c.bearer.AccessToken, nil
 		}
 	}
 
@@ -76,11 +76,10 @@ func (c *Client) getBearer() (string, error) {
 	resp, err := c.authClient.R().
 		SetBody(map[string]interface{}{
 			"grant_type":    "client_credentials",
-			"client_id":     c.ClientID,
-			"client_secret": c.ClientSecret,
+			"client_id":     c.clientID,
+			"client_secret": c.clientSecret,
 		}).
 		SetResult(authResult).
-		
 		Post("/auth/access-tokens")
 
 	if err != nil {
@@ -97,10 +96,10 @@ func (c *Client) getBearer() (string, error) {
 
 	}
 
-	c.Bearer = authResult
-	c.BearerExpiry = resp.ReceivedAt().Add(time.Second * time.Duration(c.Bearer.ExpiresIn))
-	log.Debugf("got auth! " + c.BearerExpiry.String())
-	return c.Bearer.AccessToken, nil
+	c.bearer = authResult
+	c.bearerExpiry = resp.ReceivedAt().Add(time.Second * time.Duration(c.bearer.ExpiresIn))
+	log.Debugf("got auth! " + c.bearerExpiry.String())
+	return c.bearer.AccessToken, nil
 }
 
 func (c *Client) ListLetters() (result *LetterList, err error) {
@@ -109,7 +108,7 @@ func (c *Client) ListLetters() (result *LetterList, err error) {
 	resp, err := c.httpClient.R().
 		SetResult(&result).
 		SetError(&ApiError{}).
-		Get(fmt.Sprintf("/organisations/%s/letters", c.OrganisationId))
+		Get(fmt.Sprintf("/organisations/%s/letters", c.organisationId))
 
 	if err != nil || resp.StatusCode() != 200 {
 		log.Errorf("ListLetters error: %v", err)
@@ -132,7 +131,7 @@ func (c *Client) GetLetter(letterID string) (result *Letter, err error) {
 	resp, err := c.httpClient.R().
 		SetResult(&result).
 		SetError(&ApiError{}).
-		Get(fmt.Sprintf("/organisations/%s/letters/%s", c.OrganisationId, letterID))
+		Get(fmt.Sprintf("/organisations/%s/letters/%s", c.organisationId, letterID))
 
 	if err != nil {
 		log.Errorf("Error: %v", err)
@@ -153,7 +152,7 @@ func (c *Client) GetLetter(letterID string) (result *Letter, err error) {
 func (c *Client) CancelLetter(letterID string) (err error) {
 	resp, err := c.httpClient.R().
 		SetError(&ApiError{}).
-		Patch(fmt.Sprintf("/organisations/%s/letters/%s/cancel", c.OrganisationId, letterID))
+		Patch(fmt.Sprintf("/organisations/%s/letters/%s/cancel", c.organisationId, letterID))
 
 	if err != nil {
 		log.Errorf("Error: %v", err)
@@ -172,7 +171,7 @@ func (c *Client) CancelLetter(letterID string) (err error) {
 func (c *Client) DeleteLetter(letterID string) (err error) {
 	resp, err := c.httpClient.R().
 		SetError(&ApiError{}).
-		Delete(fmt.Sprintf("/organisations/%s/letters/%s", c.OrganisationId, letterID))
+		Delete(fmt.Sprintf("/organisations/%s/letters/%s", c.organisationId, letterID))
 
 	if err != nil {
 		log.Errorf("Error: %v", err)
@@ -196,17 +195,17 @@ Function that uploads the pdf file and creates a letter. Required letter data ne
 
 createData.Data.Attributes.AddressPosition must be right or left
 
-createData.Data.Attributes.DeliveryProduct can be empty, "fast", "cheap", "bulk", "premium", "registered"
+createData.Data.Attributes.DeliveryProduct can be empty, "fast", "cheap", "bulk", "premium", "registered", defaults to cheap
 
-createData.Data.Attributes.PrintMode can be empty, "simplex", "duplex"
+createData.Data.Attributes.PrintMode can be "simplex", "duplex", defaults to simplex
 
-createData.Data.Attributes.PrintSpectrum can be empty, "grayscale", "color"
+createData.Data.Attributes.PrintSpectrum can be "grayscale", "color", defaults to grayscale
 
 createData.Data.Attributes.FileURL & createData.Data.Attributes.FileURLSignature will be autofilled.
 */
 func (c *Client) CreateLetter(uploadPDF []byte, createData *CreateData) (result *Letter, err error) {
 	result = &Letter{}
-	//todo: validate createData
+	validateCreateData(createData)
 
 	//get upload url
 	uploadData := &UploadData{}
@@ -226,7 +225,7 @@ func (c *Client) CreateLetter(uploadPDF []byte, createData *CreateData) (result 
 		return nil, fmt.Errorf("UploadFile with api message: %v", errData.Errors)
 	}
 
-	log.Debugf("Got file upload entpoint: url %s, sig %s", uploadData.Data.Attributes.URL, uploadData.Data.Attributes.URLSignature)
+	log.Debugf("Got file upload endpoint: url %s, sig %s", uploadData.Data.Attributes.URL, uploadData.Data.Attributes.URLSignature)
 
 	//upload file
 	//Important: NO AUTH HEADER
@@ -263,7 +262,7 @@ func (c *Client) CreateLetter(uploadPDF []byte, createData *CreateData) (result 
 		SetBody(createData).
 		SetResult(result).
 		SetError(&ApiError{}).
-		Post(fmt.Sprintf("/organisations/%s/letters", c.OrganisationId))
+		Post(fmt.Sprintf("/organisations/%s/letters", c.organisationId))
 
 	if err != nil {
 		log.Errorf("Error: %v", err)
@@ -276,6 +275,59 @@ func (c *Client) CreateLetter(uploadPDF []byte, createData *CreateData) (result 
 	}
 
 	log.Debugf("Created letter: %s", result.Data.ID)
+	return result, nil
+}
+
+func validateCreateData(createData *CreateData) error {
+	if createData.Data.Attributes.PrintMode == "" {
+		createData.Data.Attributes.PrintMode = "simplex"
+	}
+	if createData.Data.Attributes.PrintSpectrum == "" {
+		createData.Data.Attributes.PrintSpectrum = "grayscale"
+	}
+	if createData.Data.Attributes.DeliveryProduct == "" {
+		createData.Data.Attributes.DeliveryProduct = "cheap"
+	}
+	return nil
+}
+
+/*
+Function that sends a letter.
+
+--
+
+data.Data.Attributes.DeliveryProduct can be empty, "fast", "cheap", "bulk", "premium", "registered"
+
+data.Data.Attributes.PrintMode can be empty, "simplex", "duplex"
+
+data.Data.Attributes.PrintSpectrum can be empty, "grayscale", "color"
+
+Data.Type & Data.ID will be autofilled
+*/
+func (c *Client) SendLetter(letterID string, data *SendData) (result *Letter, err error) {
+	result = &Letter{}
+	//todo validate senddata
+	data.Data.Type = "letters"
+	data.Data.ID = letterID
+
+	resp, err := c.httpClient.R().
+		SetHeader("Content-Type", "application/vnd.api+json").
+		SetBody(data).
+		SetError(&ApiError{}).
+		SetResult(result).
+		Patch(fmt.Sprintf("/organisations/%s/letters/%s/send", c.organisationId, letterID))
+
+	if err != nil {
+		log.Errorf("Error: %v", err)
+		return nil, fmt.Errorf("SendLetter failed %w", err)
+	}
+	if resp.IsError() {
+		errData := resp.Error().(*ApiError)
+		log.Errorf("Api error: %v", errData)
+		return nil, fmt.Errorf("SendLetter with api message: %v", errData.Errors)
+	}
+
+	log.Debugf("Letter %s sent", letterID)
 	return result, nil
 }
 
