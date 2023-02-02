@@ -11,13 +11,13 @@ import (
 )
 
 func init() {
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
 }
 
 func main() {
 	log.Info("Startup")
-	err := godotenv.Load(".env.dev")
+	err := godotenv.Load(".env.prod")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -27,7 +27,7 @@ func main() {
 	org := os.Getenv("PINGEN_ORG")
 
 	var c *pingen.Client
-	c, err = pingen.NewClient(clientID, clientSecret, false, org, context.Background())
+	c, err = pingen.NewClient(clientID, clientSecret, true, org, context.Background())
 	if err != nil {
 		log.Fatalf("Init failed, error %w", err)
 	}
