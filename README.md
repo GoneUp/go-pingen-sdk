@@ -1,4 +1,8 @@
 # go-pingen-sdk
+![Build Status](https://github.com/goneup/go-pingen-sdk/workflows/release/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/goneup/go-pingen-sdk)](https://goreportcard.com/report/github.com/goneup/go-pingen-sdk
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/goneup/go-pingen-sdk?style=plastic)
+
 
 A personal hobby project that implements the API of postal provider [pingen.com](https://www.pingen.com).
 
