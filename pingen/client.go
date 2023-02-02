@@ -288,6 +288,11 @@ func validateCreateData(createData *CreateData) error {
 	if createData.Data.Attributes.DeliveryProduct == "" {
 		createData.Data.Attributes.DeliveryProduct = "cheap"
 	}
+
+	if createData.Data.Attributes.AddressPosition != "left" &&
+		createData.Data.Attributes.AddressPosition != "right" {
+		return fmt.Errorf("addressPosition must be right or left")
+	}
 	return nil
 }
 
