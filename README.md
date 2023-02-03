@@ -4,7 +4,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/goneup/go-pingen-sdk?style=plastic)
 
 
-A personal hobby project that implements the API of postal provider [pingen.com](https://www.pingen.com).
+A personal hobby project that implements the API of postal provider [pingen.com](https://www.pingen.com) in Go.
 
 **Not affiliated in any way with pingen.com**
 
@@ -12,7 +12,7 @@ A personal hobby project that implements the API of postal provider [pingen.com]
 
 Import it with
 ```
-    go get github.com/GoneUp/go-pingen-sdk
+    go get github.com/goneup/go-pingen-sdk
 ```
 
 Simple usage with (or see [main.go](main.go))

@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/GoneUp/go-pingen-sdk/pingen"
+	"github.com/goneup/go-pingen-sdk/pingen"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )

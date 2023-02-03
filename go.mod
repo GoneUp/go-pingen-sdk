@@ -1,4 +1,4 @@
-module github.com/GoneUp/go-pingen-sdk
+module github.com/goneup/go-pingen-sdk
 
 go 1.18
 
