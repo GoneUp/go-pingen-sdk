@@ -46,7 +46,7 @@ func NewClient(clientID string, clientSecret string, useProd bool, organisationI
 		c.identiyUrl = "https://identity-staging.pingen.com"
 	}
 
-	//order is important, auth needs to be initalized first
+	//order is important, auth needs to be initialized first
 	c.authClient = resty.New()
 	c.authClient.SetBaseURL(c.identiyUrl)
 
