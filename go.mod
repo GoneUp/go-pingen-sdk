@@ -1,10 +1,9 @@
 module github.com/goneup/go-pingen-sdk
 
-go 1.18
+go 1.20
 
 require (
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/joho/godotenv v1.4.0
 	github.com/sirupsen/logrus v1.9.0
 )
 

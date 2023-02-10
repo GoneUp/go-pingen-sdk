@@ -30,7 +30,7 @@ type AuthSuccess struct {
 	AccessToken string `json:"access_token"`
 }
 
-//Creates a new client struct
+// Creates a new client struct.
 func NewClient(clientID string, clientSecret string, useProd bool, organisationId string, ctx context.Context) (*Client, error) {
 	c := &Client{}
 
@@ -63,6 +63,7 @@ func NewClient(clientID string, clientSecret string, useProd bool, organisationI
 	return c, nil
 }
 
+// Requests a bearer token
 func (c *Client) getBearer() (string, error) {
 	//Check if we have cached values
 	if !c.bearerExpiry.IsZero() && c.bearer != nil {
@@ -102,6 +103,7 @@ func (c *Client) getBearer() (string, error) {
 	return c.bearer.AccessToken, nil
 }
 
+//Return a list of all letters
 func (c *Client) ListLetters() (result *LetterList, err error) {
 	result = &LetterList{}
 
@@ -124,7 +126,7 @@ func (c *Client) ListLetters() (result *LetterList, err error) {
 	return result, nil
 }
 
-//Letter CRUD
+//Retrives details for one letter
 func (c *Client) GetLetter(letterID string) (result *Letter, err error) {
 	result = &Letter{}
 
@@ -149,6 +151,8 @@ func (c *Client) GetLetter(letterID string) (result *Letter, err error) {
 	return result, nil
 }
 
+// Tries to cancel the sending of a letter.
+// If no error is returned the letter was canceled
 func (c *Client) CancelLetter(letterID string) (err error) {
 	resp, err := c.httpClient.R().
 		SetError(&ApiError{}).
@@ -168,6 +172,8 @@ func (c *Client) CancelLetter(letterID string) (err error) {
 	return nil
 }
 
+// Tries to delete a letter.
+// If no error is returned the letter was deleted
 func (c *Client) DeleteLetter(letterID string) (err error) {
 	resp, err := c.httpClient.R().
 		SetError(&ApiError{}).
@@ -337,7 +343,7 @@ func (c *Client) SendLetter(letterID string, data *SendData) (result *Letter, er
 }
 
 /*
-status:
+letter status:
 valid
 action_required
 proccesing
@@ -346,9 +352,3 @@ sent
 undeliverable
 unprintable
 */
-
-//file upload
-//create a letter
-//get letter details
-//get file of letter
-//get letter collection

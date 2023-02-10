@@ -9,6 +9,8 @@ A personal hobby project that implements the API of postal provider [pingen.com]
 **Not affiliated in any way with pingen.com**
 
 ## Usage
+> **Warning**
+> This API sends real letters and costs money. After you sent a letter it is validated and printed. There is only a very short timeframe before printing were you can cancel a letter.
 
 Import it with
 ```
@@ -27,6 +29,7 @@ Simple usage with (or see [main.go](main.go))
 	
 ```
 
+For a complete overview of methods, refer to the [go package documentation](https://pkg.go.dev/github.com/goneup/go-pingen-sdk) 
 
 ## API Information
 
