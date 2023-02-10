@@ -1,5 +1,11 @@
 package pingen
 
+type AuthSuccess struct {
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+}
+
 type ApiError struct {
 	Errors []struct {
 		Code   string `json:"code"`

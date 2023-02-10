@@ -24,12 +24,6 @@ type Client struct {
 	authClient   *resty.Client
 }
 
-type AuthSuccess struct {
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-	AccessToken string `json:"access_token"`
-}
-
 // Creates a new client struct.
 func NewClient(clientID string, clientSecret string, useProd bool, organisationId string, ctx context.Context) (*Client, error) {
 	c := &Client{}
