@@ -17,7 +17,7 @@ Import it with
     go get github.com/goneup/go-pingen-sdk
 ```
 
-Simple usage with (or see [main.go](main.go))
+Simple usage with. A full example can be found at [full_example.go](examples/full_example.go).
 ```go
     clientID := os.Getenv("CLIENT_ID")
     clientSecret := os.Getenv("CLIENT_SECRET")
