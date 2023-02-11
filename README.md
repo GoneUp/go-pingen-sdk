@@ -10,7 +10,7 @@ A personal hobby project that implements the API of postal provider [pingen.com]
 
 ## Usage
 > **Warning**
-> This API sends real letters and costs money. After you sent a letter it is validated and printed. There is only a very short timeframe before printing were you can cancel a letter.
+> This API sends real letters and costs money. After you send a letter it is validated and printed.   There is only a very short timeframe before printing where the sending process can be canceled.
 
 Import it with
 ```
